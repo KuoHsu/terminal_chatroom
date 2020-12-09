@@ -4,3 +4,52 @@
 # 關閉聊天室事件
 # 取得指定聊天室
 # 取得聊天室列表
+import random
+import Chatroom_server
+
+
+class ChatroomPool_server():
+
+    def __init__(self):
+        super().__init__()
+        self.CIDlist = []
+        self.chatroomList = {}
+        self.chatroomCount = 0
+
+    def __getNewCID__(self):
+        nCID = ""
+
+        for i in range(0, 6):
+            ac = random.randint(65, 90)
+            nCID += chr(ac)
+        while nCID in self.CIDlist:
+            nCID = ""
+            for i in range(0, 6):
+                ac = random.randint(65, 90)
+                nCID += chr(ac)
+
+        self.CIDlist.append(nCID)
+        return nCID
+
+    def createNewChatroom(self, name):
+        CID = __getNewCID__()
+        newChatroom = Chatroom_server(CID, name, self)
+        self.chatroomList[CID] = newChatroom
+        return newChatroom
+
+    def getChatroom(self, CID):
+        if CID in CIDlist:
+            return self.chatroomList[CID]
+        else:
+            return None
+
+    def chatroomClose(self, CID):
+        del self.chatroomList[CID]
+        CIDlist.remove(CID)
+
+    def getChatroomList(self):
+        msg = ""
+        for cid in self.CIDlist:
+            chatroom = self.chatroomList[cid]
+            msg += chatroom.CID + " - " + chatroom.name
+        return msg
