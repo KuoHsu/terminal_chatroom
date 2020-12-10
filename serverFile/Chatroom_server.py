@@ -25,7 +25,7 @@ class Chatroom_server:
         self.memberCount += 1
         msg = user.getName() + " 加入了聊天室！"
         exu = user.getUID()
-        __innerBroadcast__(msg, [exu])
+        self.__innerBroadcast__(msg, [exu])
         return True
 
     def memberLeave(self, user: User_server):
@@ -33,20 +33,20 @@ class Chatroom_server:
         uid = user.getUID()
         del self.members[uid]
         self.memberCount -= 1
-        __innerBroadcast__(msg, [])
+        self.__innerBroadcast__(msg, [])
         if self.memberCount == 0:
-            __close__()
+            self.__close__()
         return True
 
     def memberMessage(self, user: User_server, msg):
         message = user.getName() + ": " + msg
         exu = user.getUID()
-        __innerBroadcast__(message, [exu])
+        self.__innerBroadcast__(message, [exu])
 
     def __innerBroadcast__(self, msg, excludingUser):
         for uid in self.members:
             if uid not in excludingUser:
-                members[uid].send('chatroom', 'msg', msg)
+                self.members[uid].send('chatroom', 'msg', msg)
 
     def __assignSend__(self, receiver: User_server, msg):
         uid = receiver.getUID()
@@ -54,7 +54,8 @@ class Chatroom_server:
         _receiver.send('chatroom', 'msg', msg)
 
     def getChatroomInfo(self):
-        msg = self.CID + "\n" + self.name + "\n" + self.memberCount
+        msg = " 編號: %s | 室名: %s | 人數: %d" % (
+            self.CID, self.name, self.memberCount)
         return msg
 
     def getCID(self):

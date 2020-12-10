@@ -32,24 +32,25 @@ class ChatroomPool_server:
         return nCID
 
     def createNewChatroom(self, name):
-        CID = __getNewCID__()
+        CID = self.__getNewCID__()
         newChatroom = Chatroom_server(CID, name, self)
         self.chatroomList[CID] = newChatroom
         return newChatroom
 
     def getChatroom(self, CID):
-        if CID in CIDlist:
+        if CID in self.CIDlist:
             return self.chatroomList[CID]
         else:
             return None
 
     def chatroomClose(self, CID):
         del self.chatroomList[CID]
-        CIDlist.remove(CID)
+        self.CIDlist.remove(CID)
+        print("[聊天室 - %s]聊天室關閉了。" % CID)
 
     def getChatroomList(self):
         msg = ""
         for cid in self.CIDlist:
             chatroom = self.chatroomList[cid]
-            msg += chatroom.CID + " - " + chatroom.name
+            msg += chatroom.getChatroomInfo() + "\n"
         return msg

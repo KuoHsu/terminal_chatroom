@@ -19,7 +19,9 @@ class ChatroomOperator_server:
 
     def createNewChatroom(self, creator: User_server, name):
         chatroom = self.chatroomPool.createNewChatroom(name)
+        chatroom.newMember(creator)
         cid = chatroom.getCID()
+
         return cid
 
     def userSendMessage(self, user: User_server, CID, msg):
@@ -29,6 +31,8 @@ class ChatroomOperator_server:
 
     def joinChatroom(self, user: User_server, CID):
         chatroom = self.chatroomPool.getChatroom(CID)
+        if chatroom is None:
+            return False
         flag = chatroom.newMember(user)
         return flag
 
@@ -39,6 +43,8 @@ class ChatroomOperator_server:
 
     def getChatroomInfo(self, CID):
         chatroom = self.chatroomPool.getChatroom(CID)
+        if chatroom is None:
+            return "CID-error"
         msg = chatroom.getChatroomInfo()
         return msg
 
