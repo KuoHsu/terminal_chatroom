@@ -1,6 +1,6 @@
-import ChatroomPool_server
-import Chatroom_server
-import User_server
+from serverFile.ChatroomPool_server import *
+from serverFile.Chatroom_server import *
+from serverFile.User_server import *
 # 該類別為聊天室操作相關功能模組，包含建立、加入、離開、發言、設定聊天室
 
 
@@ -11,16 +11,16 @@ import User_server
 # 使用者在指定聊天室發言
 # 取得聊天室資訊列表
 
-class ChatroomOperator():
+class ChatroomOperator_server:
 
     def __init__(self):
         super().__init__()
         self.chatroomPool = ChatroomPool_server()
 
-    def createNewChatroom(self, creator: User_server):
-        chatroom = chatroomPool.createNewChatroom()
-        flag = chatroom.newMember(creator)
-        return flag
+    def createNewChatroom(self, creator: User_server, name):
+        chatroom = self.chatroomPool.createNewChatroom(name)
+        cid = chatroom.getCID()
+        return cid
 
     def userSendMessage(self, user: User_server, CID, msg):
         chatroom = self.chatroomPool.getChatroom(CID)
@@ -43,4 +43,4 @@ class ChatroomOperator():
         return msg
 
     def getChatroomList(self):
-        return chatroomPool.getChatroomList()
+        return self.chatroomPool.getChatroomList()

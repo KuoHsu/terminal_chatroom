@@ -1,8 +1,8 @@
 import random
-import User_server
+from serverFile.User_server import *
 
 
-class UserPool_server():
+class UserPool_server:
 
     def __init__(self):
         self.userList = {}
@@ -14,7 +14,7 @@ class UserPool_server():
         for i in range(0, 8):
             newUID += str(random.randint(0, 9))
 
-        while newUID in uidList:
+        while newUID in self.uidList:
             newUID = ""
             for i in range(0, 8):
                 newUID += str(random.randint(0, 9))
@@ -23,7 +23,7 @@ class UserPool_server():
         return newUID
 
     def newUser(self, socket, name):
-        nUID = __getNewUID__()
+        nUID = self.__getNewUID__()
         nUser = User_server(socket, nUID, name)
         self.userList[nUID] = nUser
         self.userCount += 1

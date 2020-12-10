@@ -1,7 +1,7 @@
 import socket
-import UserPool_server
-import User_server
-import ChatroomOperator_server
+from serverFile.UserPool_server import *
+from serverFile.User_server import *
+from serverFile.ChatroomOperator_server import *
 
 
 userPool = UserPool_server()
@@ -9,7 +9,8 @@ chatroomOperator = ChatroomOperator_server()
 
 
 def mainProcess(socket, addr):
-    user = registe(socket)
+
+    user = registe(socket, addr)
     run = True
     while run:
         msg = user.getMessage()
@@ -23,26 +24,35 @@ def mainProcess(socket, addr):
             # send msg, leave chatroom
 
 
-def registe(socket):
+def registe(socket, addr):
     userName = socket.recv(1024).decode("UTF-8")
     newUser = userPool.newUser(socket, userName)
-    newUser.send("init", "registe", "ok")
+    uid = newUser.getUID()
+    newUser.send("init", "registe", uid)
+    address = "%s:%d" % (addr[0], addr[1])
+    print("連線來源: %s UID: %s 使用者名稱: %s 已連線" % (address, uid, userName))
     return newUser
 
 
 def operate(user, action, content):
     flag = True
     if action == "listChatrooms":
+
         user.send("operate", "listChatrooms",
                   chatroomOperator.getChatroomList())
-    elif action == "createNewChatroom":
-        flag = chatroomOperator.createNewChatroom(user)
+    elif action == "join":
+        cid = content
+        flag = chatroomOperator.joinChatroom(user, cid)
         if flag:
-            user.send("chatroom", "join", "success")
+            user.send("operate", "joinChatroom", "success")
         else:
-            user.send("chatroom", "join", "fail")
+            user.send("operate", "joinChatroom", "fail")
+    elif action == "createNewChatroom":
+        name = content
+        cid = chatroomOperator.createNewChatroom(user, name)
+        user.send("operate", "createNewChatroom", cid)
     elif action == "disconnect":
-        user.send("operate", "leave", True)
+        user.send("operate", "disconnect", "ok")
         user.disconnect()
         userPool.removeUser(user.getUID())
         flag = False

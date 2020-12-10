@@ -1,5 +1,5 @@
-import User_server
-import ChatroomPool_server
+from serverFile.UserPool_server import *
+from serverFile.ChatroomPool_server import *
 # 個別聊天室內部使用者管理
 # 0. 以隨機6碼由大寫英文、數字組合成之ID與指定名稱建立
 # 1. 加入使用者
@@ -11,9 +11,9 @@ import ChatroomPool_server
 # 8. 取得聊天室資訊
 
 
-class Chatroom_server():
+class Chatroom_server:
 
-    def __init__(self, CID, name, managePool: ChatroomPool_server):
+    def __init__(self, CID, name, managePool):
         self.CID = CID
         self.name = name
         self.managePool = managePool
@@ -40,17 +40,18 @@ class Chatroom_server():
 
     def memberMessage(self, user: User_server, msg):
         message = user.getName() + ": " + msg
-        __innerBroadcast__(message, [])
+        exu = user.getUID()
+        __innerBroadcast__(message, [exu])
 
     def __innerBroadcast__(self, msg, excludingUser):
         for uid in self.members:
             if uid not in excludingUser:
-                members[uid].send('chartoom', 'msg', msg)
+                members[uid].send('chatroom', 'msg', msg)
 
     def __assignSend__(self, receiver: User_server, msg):
         uid = receiver.getUID()
         _receiver = self.members[uid]
-        _receiver.send('chartoom', 'msg', msg)
+        _receiver.send('chatroom', 'msg', msg)
 
     def getChatroomInfo(self):
         msg = self.CID + "\n" + self.name + "\n" + self.memberCount

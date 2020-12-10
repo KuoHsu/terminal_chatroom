@@ -5,10 +5,10 @@
 # 取得指定聊天室
 # 取得聊天室列表
 import random
-import Chatroom_server
+from serverFile.Chatroom_server import *
 
 
-class ChatroomPool_server():
+class ChatroomPool_server:
 
     def __init__(self):
         super().__init__()
