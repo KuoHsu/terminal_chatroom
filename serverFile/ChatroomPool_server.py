@@ -48,9 +48,15 @@ class ChatroomPool_server:
         self.CIDlist.remove(CID)
         print("[聊天室 - %s]聊天室關閉了。" % CID)
 
-    def getChatroomList(self):
+    def getChatroomInfoList(self):
         msg = ""
         for cid in self.CIDlist:
             chatroom = self.chatroomList[cid]
             msg += chatroom.getChatroomInfo() + "\n"
         return msg
+
+    def getChatroomIDList(self):
+        chatIdList = []
+        for cid in self.CIDlist:
+            chatIdList.append(cid)
+        return chatIdList

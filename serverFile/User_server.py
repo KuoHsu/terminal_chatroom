@@ -19,9 +19,12 @@ class User_server:
         self.socket.send(message)
 
     def getMessage(self):
-        msg = self.socket.recv(2048).decode("UTF-8")
-        message = eval(msg)
-        return message
+        try:
+            msg = self.socket.recv(2048).decode("UTF-8")
+            message = eval(msg)
+            return message
+        except ConnectionResetError as e:
+            raise
 
     def getUID(self):
         return self.UID

@@ -24,7 +24,7 @@ class ChatroomOperator_server:
 
         return cid
 
-    def userSendMessage(self, user: User_server, CID, msg):
+    def userSendMessage(self, user: User_server, CID, msg):  # 聊天室成員發送訊息
         chatroom = self.chatroomPool.getChatroom(CID)
         chatroom.memberMessage(user, msg)
         return
@@ -41,6 +41,13 @@ class ChatroomOperator_server:
         flag = chatroom.memberLeave(user)
         return flag
 
+    def userDisconnect(self, user: User_server, CID):
+        chatroom = self.chatroomPool.getChatroom(CID)
+        if chatroom is None:
+            return False
+        flag = chatroom.memberDisconnect(user)
+        return flag
+
     def getChatroomInfo(self, CID):
         chatroom = self.chatroomPool.getChatroom(CID)
         if chatroom is None:
@@ -49,4 +56,13 @@ class ChatroomOperator_server:
         return msg
 
     def getChatroomList(self):
-        return self.chatroomPool.getChatroomList()
+        return self.chatroomPool.getChatroomInfoList()
+
+    def getUserJoinChatroomIDlist(self, user):
+        cids = self.chatroomPool.getChatroomIDList()
+        chatcid = []
+        for cid in cids:
+            chatroom = self.chatroomPool.getChatroom(cid)
+            if chatroom != None and chatroom.isMember(user):
+                chatcid.append(cid)
+        return chatcid

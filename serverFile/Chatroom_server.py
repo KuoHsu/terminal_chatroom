@@ -38,6 +38,16 @@ class Chatroom_server:
             self.__close__()
         return True
 
+    def memberDisconnect(self, user: User_server):
+        msg = user.getName() + " 斷線了。"
+        uid = user.getUID()
+        del self.members[uid]
+        self.memberCount -= 1
+        self.__innerBroadcast__(msg, [])
+        if self.memberCount == 0:
+            self.__close__()
+        return True
+
     def memberMessage(self, user: User_server, msg):
         message = user.getName() + ": " + msg
         exu = user.getUID()
@@ -60,6 +70,9 @@ class Chatroom_server:
 
     def getCID(self):
         return self.CID
+
+    def isMember(self, user: User_server):
+        return user.getUID() in self.members
 
     def __close__(self):
         self.managePool.chatroomClose(self.CID)

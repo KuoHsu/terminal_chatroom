@@ -1,4 +1,5 @@
 import socket
+import threading
 from serverFile.UserPool_server import *
 from serverFile.User_server import *
 from serverFile.ChatroomOperator_server import *
@@ -13,6 +14,9 @@ class MainProcess_server:
 
         user = self.registe(socket, addr)
         run = True
+
+        print("%s run on thread %s" %
+              (user.name, threading.get_ident()))
         while run:
             try:
                 msg = user.getMessage()
@@ -20,13 +24,20 @@ class MainProcess_server:
                 msgAction = msg["action"]
                 msgContent = msg["content"]
                 if msgType == "operate":
-                    run = self.operate(user, msgAction, msgContent)
+                    run = self.hallOperating(user, msgAction, msgContent)
                 elif msgType == "chatroom":
-                    self.chatroom(user, msgAction, msgContent)
+                    self.chatroomOperating(user, msgAction, msgContent)
                     # send msg, leave chatroom
             except:
-                print("[連線]%s(%s) 意外斷線了。" % (user.getName(), user.getUID))
-                self.userPool.removeUser(user.getUID)
+                print("[連線]%s(%s) 意外斷線了。" % (user.getName(), user.getUID()))
+                cids = self.chatroomOperator.getUserJoinChatroomIDlist(
+                    user)
+                for cid in cids:
+                    self.chatroomOperating(user, "disconnect", cid)
+                self.userPool.removeUser(user.getUID())
+                run = False
+                for thread in threading.enumerate():
+                    print("thread:%s id:%d" % (thread.name, thread.ident))
 
     def registe(self, socket, addr):
         userName = socket.recv(1024).decode("UTF-8")
@@ -37,7 +48,7 @@ class MainProcess_server:
         print("[連線] %s 已連線。連線來源: %s | UID: %s" % (userName, address, uid))
         return newUser
 
-    def operate(self, user, action, content):
+    def hallOperating(self, user, action, content):
         flag = True
         uid = user.getUID()
         uname = user.getName()
@@ -60,6 +71,7 @@ class MainProcess_server:
             user.send("operate", "createNewChatroom", cid)
             print("[聊天室 - %s] 聊天室建立，聊天室名稱 %s，建立者 %s(%s)" %
                   (cid, name,  uname, uid))
+
         elif action == "disconnect":
             user.send("operate", "disconnect", "ok")
             user.disconnect()
@@ -68,7 +80,7 @@ class MainProcess_server:
             flag = False
         return flag
 
-    def chatroom(self, user, action, content):
+    def chatroomOperating(self, user, action, content):
         uid = user.getUID()
         uname = user.getName()
         if action == "msg":
@@ -89,3 +101,8 @@ class MainProcess_server:
                 print("[聊天室 - %s] %s(%s) 離開聊天室。" % (cid, uname, uid))
             else:
                 user.send("chatroom", "leave", "fail")
+        elif action == "disconnect":
+            cid = content
+            flag = self.chatroomOperator.userDisconnect(user, cid)
+            if flag:
+                print("[聊天室 - %s] %s(%s) 斷線了。" % (cid, uname, uid))

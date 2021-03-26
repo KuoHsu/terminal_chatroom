@@ -13,17 +13,20 @@ class MainProcess_Client:
         run = True
         t = 1
         while run:
-            if t == 1:
-                t = self.operate(user)
-            elif t == 2:
+            try:
+                if t == 1:
+                    t = self.hallOperating(user)
+                elif t == 2:
+                    t = self.chatroomOperating(user, self.chatroomID)
+                    self.chatroomID = ""
+                elif t == 3:
+                    run = False
+                    user.close()
+            except:
+                print("無法連上伺服器！")
+                exit()
 
-                t = self.chatroom(user, self.chatroomID)
-                self.chatroomID = ""
-            elif t == 3:
-                run = False
-                user.close()
-
-    def operate(self, user):
+    def hallOperating(self, user):
         f = 1
         while f == 1:
             selection = input(
@@ -56,7 +59,7 @@ class MainProcess_Client:
                 print("請輸入 1, 2, 3或0！\n")
         return f
 
-    def chatroom(self, user, cid):
+    def chatroomOperating(self, user, cid):
         f = 2
         chatroomMsgThread = threading.Thread(
             target=self.listenChatroomMsg, args=(user,))
