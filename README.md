@@ -1,2 +1,2 @@
 # terminal_chatroom
-The terminal chatroom created by Python
+The terminal chatroom program made from Python
