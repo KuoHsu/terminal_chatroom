@@ -1,8 +1,8 @@
 # terminal_chatroom
 The terminal chatroom program made from Python
 
-run server
-'python server.py'
+run server<br>
+`python server.py`
 
-run client
-'python client.py'
+run client<br>
+`python client.py`
